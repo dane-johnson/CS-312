@@ -205,10 +205,6 @@ int main( int argc, char* argv[] )
 	// tell omp how many threads to use
 	omp_set_num_threads( numThreads );
 	
-#pragma omp parallel
-	{
-	}
-	
 	stopwatch S1;
 	S1.start();
 	
@@ -239,6 +235,7 @@ double findmaxavg(val data, const int& rows, const int& cols, list<ordered_pair>
 	double max = findlocalavg(data, 0, 0, rows, cols); //set first value to max
 	pairs.push_front(ordered_pair(0, 0));
 	
+	#pragma omp parallel for
 	for(int i = 0; i < rows; i++)
 	{
 		for(int j = 0; j < cols; j++)
