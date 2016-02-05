@@ -9,6 +9,11 @@
 
 using namespace std;
 
+typedef unsigned int ** val;
+
+double findmaxavg(val, const int&, const int&);
+double findlocalavg(val, const int&, const int&, const int&, const int&);
+
 // a class to get more accurate time
 
 class stopwatch{
@@ -192,17 +197,85 @@ int main( int argc, char* argv[] )
 	
 	stopwatch S1;
 	S1.start();
-
-	/////////////////////////////////////////////////////////////////////
-	///////////////////////  YOUR CODE HERE       ///////////////////////
-	/////////////////////////////////////////////////////////////////////
-
+	
+	double avg;
+	
+	avg = findmaxavg(data, rows, cols);
 	
 	S1.stop();
 	
 	// print out the max value here
 	
+	cout << "Maximum Local Average: " << avg << endl;
 	cerr << "elapsed time: " << S1.getTime( ) << endl;
+}
+
+//finds max average iteratively
+double findmaxavg(val data, const int& rows, const int& cols)
+{
+	double max = findlocalavg(data, 0, 0, rows, cols); //set first value to max
+	for(int i = 0; i < rows; i++)
+	{
+		for(int j = 0; j < cols; j++)
+		{
+			double test = findlocalavg(data, i, j, rows, cols); //get the local average
+			if(test > max)
+			{
+				test = max; // if it's better, replace it
+			}
+		}
+	}
+	
+	return max;
+}
+
+//
+double findlocalavg(val data, const int& i, const int& j, const int& rows, const int& cols)
+{
+	int nvals = 1, total = data[i][j]; //We have at least one value
+	bool isTop = (j == 0), isBottom = (j + 1 == cols), isLeftEdge = (i == 0), isRightEdge = (i + 1 == rows);
+	if(!isLeftEdge) //We're clear to the left
+	{
+		nvals++;
+		total += data[i - 1][j];
+		if(!isTop)//Top left clear
+		{
+			nvals++;
+			total += data[i - 1][j - 1];
+		}
+		if(!isBottom)//Bottom left clear
+		{
+			nvals++;
+			total += data[i - 1][j + 1];
+		}
+	}
+	if(!isRightEdge) //We're clear to the right
+	{
+		nvals++;
+		total += data[i + 1][j];
+		if(!isTop)//Top right clear
+		{
+			nvals++;
+			total += data[i + 1][j - 1];
+		}
+		if(!isBottom)//Bottom right clear
+		{
+			nvals++;
+			total += data[i + 1][j + 1];
+		}
+	}
+	if(!isTop) //Top clear
+	{
+		nvals++;
+		total += data[i][j - 1];
+	}
+	if(!isBottom)
+	{
+		nvals++;
+		total += data[i][j + 1];
+	}
+	
+	return double(total) / nvals;
 }
 
 
