@@ -11,7 +11,19 @@ using namespace std;
 
 typedef unsigned int ** val;
 
-double findmaxavg(val, const int&, const int&);
+struct ordered_pair
+{
+	int x;
+	int y;
+	ordered_pair(){}
+	ordered_pair(int init_x, int init_y)
+	{
+		x = init_x;
+		y = init_y;
+	}
+};
+
+double findmaxavg(val, const int&, const int&, list<ordered_pair>&);
 double findlocalavg(val, const int&, const int&, const int&, const int&);
 
 // a class to get more accurate time
@@ -176,17 +188,17 @@ int main( int argc, char* argv[] )
 		getDataFromFile( data,  argv[1], rows, cols );
 	}
 	
-		cerr << "data: " << endl;
+		//cerr << "data: " << endl;
 	 for( unsigned int i = 0; i < rows; i++ )
 	 {
 	 for( unsigned int j = 0; j < cols; j++ )
 	 {
-	 cerr << "i,j,data " << i << ", " << j << ", ";
-	 cerr << data[i][j] << " ";
+	 //cerr << "i,j,data " << i << ", " << j << ", ";
+	 //cerr << data[i][j] << " ";
 	 }
-	 cerr << endl;
+	 //cerr << endl;
 	 }
-	 cerr<< endl;
+	 //cerr<< endl;
 	
 	// tell omp how many threads to use
 	omp_set_num_threads( numThreads );
@@ -199,21 +211,32 @@ int main( int argc, char* argv[] )
 	S1.start();
 	
 	double avg;
+	list<ordered_pair> pairs;
 	
-	avg = findmaxavg(data, rows, cols);
+	avg = findmaxavg(data, rows, cols, pairs);
 	
 	S1.stop();
 	
 	// print out the max value here
 	
-	cout << "Maximum Local Average: " << avg << endl;
+	cout << "largest average: " << avg << endl;
+	cout << "found at cells: ";
+	while(!pairs.empty())
+	{
+		ordered_pair curr = pairs.front();
+		cout << "(" << curr.x << ", " << curr.y <<")  ";
+		pairs.pop_front();
+	}
+	cout << endl;
 	cerr << "elapsed time: " << S1.getTime( ) << endl;
 }
 
 //finds max average iteratively
-double findmaxavg(val data, const int& rows, const int& cols)
+double findmaxavg(val data, const int& rows, const int& cols, list<ordered_pair>& pairs)
 {
 	double max = findlocalavg(data, 0, 0, rows, cols); //set first value to max
+	pairs.push_front(ordered_pair(0, 0));
+	
 	for(int i = 0; i < rows; i++)
 	{
 		for(int j = 0; j < cols; j++)
@@ -221,8 +244,14 @@ double findmaxavg(val data, const int& rows, const int& cols)
 			double test = findlocalavg(data, i, j, rows, cols); //get the local average
 			if(test > max)
 			{
-				test = max; // if it's better, replace it
-			}
+				max = test; // if it's better, replace it
+				pairs.clear();
+				pairs.push_front(ordered_pair(i, j));
+			} 
+			else if (test == max)
+			{
+				pairs.push_back(ordered_pair(i, j));
+			}				//They are the same, add this to the pairs
 		}
 	}
 	
