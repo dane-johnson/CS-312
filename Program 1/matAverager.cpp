@@ -1,3 +1,5 @@
+//Most of this code by Professor Mark McKenny
+//Averaging algorithm by Dane Johnson
 #include <sys/time.h>
 #include <fstream>
 #include <iostream>
