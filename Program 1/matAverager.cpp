@@ -245,16 +245,19 @@ double findmaxavg(val data, const int& rows, const int& cols, list<ordered_pair>
 			{
 				#pragma omp critical
 				{
-				max = test; // if it's better, replace it
-				pairs.clear();
-				pairs.push_front(ordered_pair(i, j));
+					if(test > max)
+					{
+						max = test; // if it's better, replace it
+						pairs.clear();
+						pairs.push_front(ordered_pair(i, j));
+					}
 				}
 			} 
 			else if (test == max)
 			{
 				#pragma omp critical
 				{
-				pairs.push_back(ordered_pair(i, j));
+					pairs.push_back(ordered_pair(i, j));
 				}
 			}				//They are the same, add this to the pairs
 		}
