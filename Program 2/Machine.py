@@ -3,7 +3,6 @@ from Word import *
 class Machine:
 	register = [0] * 32; #Creates an array of 32 values, initialized at 0 for all
 	instructions = [];
-	currentLine = 0;
 	
 	def loadInstructions(self, instructions):
 		self.instructions = instructions;
@@ -19,9 +18,9 @@ class Machine:
 			word = IType(instruction);
 			print "IType Instruction Received"
 	def executeInstructions(self):
-		while(self.currentLine < len(self.instructions)):
-			self.execute(self.instructions[self.currentLine]);
-			self.currentLine += 1;
-		self.currentLine = 0;
+		while(self.register[PC] < len(self.instructions)):
+			self.execute(self.instructions[self.register[PC]:self.register[PC] + 4]);#Read in the next 4 bytes as 1 word
+			self.register[PC] += 4;
+		self.register[PC] = 0;
 
-			
+PC = 1;
