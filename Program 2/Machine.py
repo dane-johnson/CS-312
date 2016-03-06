@@ -22,4 +22,6 @@ class Machine:
 		while(self.currentLine < len(self.instructions)):
 			self.execute(self.instructions[self.currentLine]);
 			self.currentLine += 1;
+		self.currentLine = 0;
+
 			
