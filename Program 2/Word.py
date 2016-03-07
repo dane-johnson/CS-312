@@ -1,14 +1,20 @@
 class Word:
 	word = 0;
-	def __init__(self, bytes):
-		self.word += bytes[0] * 2**24;
-		self.word += bytes[1] * 2**16;
-		self.word += bytes[2] * 2**8;
-		self.word += bytes[3];
+	def __init__(self, word):
+		self.word = word
+		
+class Instruction(Word):
+	addr = 0;
+	def __init__(self, word, addr):
+		self.word = word
+		self.addr = addr
 	def getOp(self):
-		return ((self.word & 0b11111100000000000000000000000000) >> 26);
+		return ((self.word & 0b11111100000000000000000000000000) >> 26)
 
 class RType(Word):
+	def __init__(self, instruction):
+		self.word = instruction.word
+		self.addr = instruction.addr
 	def __getitem__(self, index):
 		return {
 			'op'    : ((self.word & 0b11111100000000000000000000000000) >> 26),
@@ -20,6 +26,9 @@ class RType(Word):
 		}[index]
 		
 class IType(Word):
+	def __init__(self, instruction):
+		self.word = instruction.word
+		self.addr = instruction.addr
 	def __getitem__(self, index):
 		return {
 			'op'    : ((self.word & 0b11111100000000000000000000000000) >> 26),
@@ -29,6 +38,9 @@ class IType(Word):
 		}[index]
 		
 class JType(Word):
+	def __init__(self, instruction):
+		self.word = instruction.word
+		self.addr = instruction.addr
 	def __getitem__(self, index):
 		return {
 			'op'    : ((self.word & 0b11111100000000000000000000000000) >> 26),
