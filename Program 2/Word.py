@@ -3,11 +3,11 @@ class Word:
 	def __init__(self, word):
 		self.word = word
 		
-class Instruction(Instruction):
+class Instruction(Word):
 	addr = 0;
-	def __init__(self, instruction):
-		self.word = instruction.word
-		self.addr = instruction.addr
+	def __init__(self, word, addr):
+		self.word = word
+		self.addr = addr
 	def __getitem__(self, index):
 		return {
 			'op'    : ((self.word & 0b11111100000000000000000000000000) >> 26),
