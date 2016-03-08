@@ -1,27 +1,26 @@
 from Word import *
 def disassembleInstruction(instruction):
-	shouldBreak = {
-		0b100000: # R Type, many cases
-		{
-			0b000000: False, # SLL
-			0b000010: False, # SRL
-			0b001000: False, # JR
-			0b100000: False, # ADD
-			0b100010: False, # SUB
-			0b100100: False, # AND
-			0b100101: False, # OR
-			0b001010: False, # MOVZ
-			0b001101: True  #BREAK
-		}.get(instruction['func'], NOP()),
-		0b111100: False, #MUL
-		0b100001: False, #BLTZ
-		0b100010: False, # J
-		0b100100: False, #BEQ
-		0b101000: False, #ADDI
-		0b100011: False, #LW
-		0b101011: False  #SW
-	}.get(instruction['op'], NOP())
-	return shouldBreak
+	op = instruction['op']
+	if op == 0b100000 :# R Type, many cases
+		func = instruction['func']
+		if   func == 0b000000: return SLL()	# SLL
+		elif func == 0b000010: return SRL()	# SRL
+		elif func == 0b001000: return JR()	# JR
+		elif func == 0b100000: return ADD()	# ADD
+		elif func == 0b100010: return SUB()	# SUB
+		elif func == 0b100100: return AND() # AND
+		elif func == 0b100101: return OR()	# OR
+		elif func == 0b001010: return MOVZ()# MOVZ
+		elif func == 0b001101: return BREAK()#BREAK
+		else :				   return NOP()
+	elif op == 0b111100: return MUL()	#MUL
+	elif op == 0b100001: return BLTZ()	#BLTZ
+	elif op == 0b100010: return J()		#J
+	elif op == 0b100100: return BEQ()	#BEQ
+	elif op == 0b101000: return ADDI()	#ADDI
+	elif op == 0b100011: return LW() 	#LW
+	elif op == 0b101011: return SW()  	#SW
+	else:				 return NOP()
 		
 def disassembleSet(set):
 	n = 0
@@ -32,7 +31,55 @@ def disassembleSet(set):
 	for i in range(n, len(set)):
 		displayDataValue(set[i])
 		
+def SW():
+	print 'SW'
+	return False
+def LW():
+	print 'LW'
+	return False
+def ADDI():
+	print 'ADDI'
+	return False
+def BEQ():
+	print 'BEQ'
+	return False
+def J():
+	print 'J'
+	return False
+def BLTZ():
+	print 'BLTZ'
+	return False
+def MUL():
+	print 'MUL'
+	return False
+def BREAK():
+	print 'BREAK'
+	return True
+def MOVZ():
+	print 'MOVZ'
+	return False
 def NOP():
-	return False;
+	return False
+def SLL():
+	print 'SLL'
+	return False
+def SRL():
+	print 'SRL'
+	return False
+def ADD():
+	print 'ADD'
+	return False
+def SUB():
+	print 'SUB'
+	return False
+def AND():
+	print 'AND'
+	return False
+def OR() :
+	print 'OR'
+	return False
+def JR() :
+	print 'JR'
+	return False
 def displayDataValue(word):
-	print bin(word.word)
+	print word.word
