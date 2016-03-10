@@ -27,6 +27,7 @@ def disassembleInstruction(instruction):
 def disassembleSet(set):
 	n = 0
 	for i in set:
+		printInstructionAsBinary(i)
 		shouldBreak = disassembleInstruction(i)
 		n += 1
 		if(shouldBreak): break
@@ -34,74 +35,57 @@ def disassembleSet(set):
 		displayDataValue(set[i])
 		
 def SW(instruction):
-	printInstructionAsBinary(instruction)
 	print ("SW\tR",instruction['rt'], ", ", instruction['immed'], "(R",instruction['rs'],")", sep="", file=target_file)
 	return False
 def LW(instruction):
-	printInstructionAsBinary(instruction)
 	print ("LW\tR",instruction['rt'], ", ", instruction['immed'], "(R",instruction['rs'],")", sep="", file=target_file)
 	return False
 def ADDI(instruction):
-	printInstructionAsBinary(instruction)
 	print ("ADDI\tR",instruction['rt'], ", R",instruction['rs'],", #",instruction['immed'], sep="", file=target_file) #Use rt for rd since this is an i type
 	return False
 def BEQ(instruction):
-	printInstructionAsBinary(instruction)
 	print ("BEQ\tR",instruction['rt'], ", R",instruction['rs'],", #",instruction['immed'], sep="", file=target_file) #Use rt for rd since this is an i type
 	return False
 def J(instruction):
-	printInstructionAsBinary(instruction)
 	print ("J\t#", instruction['addr'] << 2, sep="", file=target_file)
 	return False
 def BLTZ(instruction):
-	printInstructionAsBinary(instruction)
 	print ("BLTZ\tR",instruction['rs'], ", #",instruction['immed'] << 2, sep="", file=target_file)
 	return False
 def MUL(instruction):
-	printInstructionAsBinary(instruction)
 	print ("MUL\tR",instruction['rd'], ", R",instruction['rs'],", R",instruction['rt'], sep="", file=target_file)
 	return False
 def BREAK(instruction):
-	printInstructionAsBinary(instruction)
 	print ('BREAK', file=target_file)
 	return True
 def MOVZ(instruction):
-	printInstructionAsBinary(instruction)
 	print ("MOVZ\tR",instruction['rd'], ", R",instruction['rs'],", R",instruction['rt'], sep="", file=target_file)
 	return False
 def INVALID(instruction):
-	printInstructionAsBinary(instruction)
 	print ('Invalid Instruction', file=target_file)
 	return False
 def SLL(instruction): #Could also be NOP, check included
-	printInstructionAsBinary(instruction)
 	if(instruction.word & (2**31 - 1) == 0):
 		print("NOP", file=target_file)
 	else:
 		print ("SLL\tR",instruction['rd'], ", R",instruction['rt'],", #",instruction['sa'], sep="", file=target_file)
 	return False
 def SRL(instruction):
-	printInstructionAsBinary(instruction)
 	print ("SRL\tR",instruction['rd'], ", R",instruction['rt'],", #",instruction['sa'], sep="", file=target_file)
 	return False
 def ADD(instruction):
-	printInstructionAsBinary(instruction)
 	print ("ADD\tR",instruction['rd'], ", R",instruction['rs'],", R",instruction['rt'], sep="", file=target_file)
 	return False
 def SUB(instruction):
-	printInstructionAsBinary(instruction)
 	print ("SUB\tR",instruction['rd'], ", R",instruction['rs'],", R",instruction['rt'], sep="", file=target_file)
 	return False
 def AND(instruction):
-	printInstructionAsBinary(instruction)
 	print ("AND\tR",instruction['rd'], ", R",instruction['rs'],", R",instruction['rt'], sep="", file=target_file)
 	return False
 def OR(instruction) :
-	printInstructionAsBinary(instruction)
 	print ("OR\tR",instruction['rd'], ", R",instruction['rs'],", R",instruction['rt'], sep="", file=target_file)
 	return False
 def JR(instruction) :
-	printInstructionAsBinary(instruction)
 	print ("JR\tR", instruction['rs'], sep="", file=target_file)
 	return False
 def displayDataValue(word):
