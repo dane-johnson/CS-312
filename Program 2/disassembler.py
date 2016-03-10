@@ -35,11 +35,11 @@ def disassembleSet(set):
 		
 def SW(instruction):
 	printInstructionAsBinary(instruction)
-	print ("SW\tR",instruction['rt'], " ", instruction['immed'], "(R",instruction['rs'],")", sep="", file=target_file)
+	print ("SW\tR",instruction['rt'], ", ", instruction['immed'], "(R",instruction['rs'],")", sep="", file=target_file)
 	return False
 def LW(instruction):
 	printInstructionAsBinary(instruction)
-	print ("LW\tR",instruction['rt'], " ", instruction['immed'], "(R",instruction['rs'],")", sep="", file=target_file)
+	print ("LW\tR",instruction['rt'], ", ", instruction['immed'], "(R",instruction['rs'],")", sep="", file=target_file)
 	return False
 def ADDI(instruction):
 	printInstructionAsBinary(instruction)
