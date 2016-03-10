@@ -54,7 +54,7 @@ def J(instruction):
 	return False
 def BLTZ(instruction):
 	printInstructionAsBinary(instruction)
-	print ("BLTZ\tR",instruction['rt'], ", #",instruction['addr'], sep="" )
+	print ("BLTZ\tR",instruction['rt'], ", #",instruction['immed'] << 2, sep="" )
 	return False
 def MUL(instruction):
 	printInstructionAsBinary(instruction)
