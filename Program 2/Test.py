@@ -1,4 +1,4 @@
-fileName = 'test2.bin'
+fileName = 'test1.bin'
 import filemanager
 (word, address) = filemanager.loadInstructionsAndAddresses(fileName)
 instruction = []
