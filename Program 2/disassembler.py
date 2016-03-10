@@ -34,27 +34,27 @@ def disassembleSet(set):
 		
 def SW(instruction):
 	printInstructionAsBinary(instruction)
-	print ("SW\tR",instruction['rd'], " ", instruction['sa'], "(R",instruction['rt'],")", sep="" )
+	print ("SW\tR",instruction['rt'], " ", instruction['immed'], "(R",instruction['rs'],")", sep="" )
 	return False
 def LW(instruction):
 	printInstructionAsBinary(instruction)
-	print ("LW\tR",instruction['rd'], " ", instruction['sa'], "(R",instruction['rt'],")", sep="" )
+	print ("LW\tR",instruction['rt'], " ", instruction['immed'], "(R",instruction['rs'],")", sep="" )
 	return False
 def ADDI(instruction):
 	printInstructionAsBinary(instruction)
-	print ("ADDI\tR",instruction['rd'], ", R",instruction['rt'],", #",instruction['immed'], sep="" )
+	print ("ADDI\tR",instruction['rt'], ", R",instruction['rs'],", #",instruction['immed'], sep="" ) #Use rt for rd since this is an i type
 	return False
 def BEQ(instruction):
 	printInstructionAsBinary(instruction)
-	print ("BEQ\tR",instruction['rd'], ", R",instruction['rt'],", #",instruction['immed'], sep="" )
+	print ("BEQ\tR",instruction['rt'], ", R",instruction['rs'],", #",instruction['immed'], sep="" ) #Use rt for rd since this is an i type
 	return False
 def J(instruction):
 	printInstructionAsBinary(instruction)
-	print ("J\t#", instruction['addr'], sep="")
+	print ("J\t#", instruction['addr'] << 2, sep="")
 	return False
 def BLTZ(instruction):
 	printInstructionAsBinary(instruction)
-	print ("BLTZ\tR",instruction['rt'], ", #",instruction['immed'] << 2, sep="" )
+	print ("BLTZ\tR",instruction['rs'], ", #",instruction['immed'] << 2, sep="" )
 	return False
 def MUL(instruction):
 	printInstructionAsBinary(instruction)
@@ -101,7 +101,7 @@ def OR(instruction) :
 	return False
 def JR(instruction) :
 	printInstructionAsBinary(instruction)
-	print ("JR\tR", instruction['rt'], sep="")
+	print ("JR\tR", instruction['rs'], sep="")
 	return False
 def displayDataValue(word):
 	for i in xrange(31, -1, -1): #decrement value
@@ -109,5 +109,5 @@ def displayDataValue(word):
 	print("\t",word.addr,"\t" , word.word, sep = "")
 def printInstructionAsBinary(instruction):
 	for i in xrange(31, -1, -1): #decrement value
-		print((instruction.word & 2**i) >> i, end=" " if (i == 31 or i == 25 or i == 20 or i == 15 or i == 10 or i == 6) else "")
+		print((instruction.word & 2**i) >> i, end=" " if (i == 31 or i == 26 or i == 21 or i == 16 or i == 11 or i == 6) else "")
 	print("\t", instruction.addr, "\t", end="", sep = "")
