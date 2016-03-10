@@ -1,5 +1,5 @@
 from __future__ import print_function
-from Word import *
+from word import *
 target_file = None;
 def disassembleInstruction(instruction):
 	op = instruction['op']

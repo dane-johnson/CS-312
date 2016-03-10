@@ -1,4 +1,4 @@
-from Word import *
+from word import *
 
 class Machine:
 	initialAddress = 0
