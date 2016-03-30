@@ -1,15 +1,17 @@
 from word import *
 
 class Machine:
-	initialAddress = 0
-	register = [0] * 32 #Creates an array of 32 values, initialized at 0 for all
-	instructions = []
-	
-	def __init__(self, initialAddress):
+	DEFAULT_INIT_PC = 96 #We always start at 96 for some reason
+	def __init__(self, initialAddress = 0):
 		self.initialAddress = initialAddress
-		self.register[PC] = initialAddress;
+		self.register = [0] * 32 #Creates an array of 32 values, initialized at 0 for all
+		self.instructions = []
+		self.PC = DEFAULT_INIT_PC
+		self.currLineDis = "INVALID"
+		
 	def loadInstructions(self, instructions):
 		self.instructions = instructions;
+		
 	def execute(self, instruction):
 		op = instruction['op']
 		if op == 0b100000 :# R Type, many cases
@@ -48,4 +50,57 @@ class Machine:
 			else: min = pivot + 1
 		return -1;
 
-PC = 1;
+	def SW(self, instruction):
+		self.currLineDis = "SW\tR",instruction['rt'], ", ", instruction['immed'], "(R",instruction['rs'],")"
+		return False
+	def LW(self, instruction):
+		self.currLineDis = "LW\tR",instruction['rt'], ", ", instruction['immed'], "(R",instruction['rs'],")"
+		return False
+	def ADDI(self, instruction):
+		self.currLineDis = "ADDI\tR",instruction['rt'], ", R",instruction['rs'],", #",instruction['immed'] #Use rt for rd since this is an i type
+		return False
+	def BEQ(self, instruction):
+		self.currLineDis = "BEQ\tR",instruction['rt'], ", R",instruction['rs'],", #",instruction['immed'] #Use rt for rd since this is an i type
+		return False
+	def J(self, instruction):
+		self.currLineDis = "J\t#", instruction['addr'] << 2
+		return False
+	def BLTZ(self, instruction):
+		self.currLineDis = "BLTZ\tR",instruction['rs'], ", #",instruction['immed'] << 2
+		return False
+	def MUL(self, instruction):
+		self.currLineDis = "MUL\tR",instruction['rd'], ", R",instruction['rs'],", R",instruction['rt']
+		return False
+	def BREAK(self, instruction):
+		self.currLineDis = 'BREAK', file=target_file)
+		return True
+	def MOVZ(self, instruction):
+		self.currLineDis = "MOVZ\tR",instruction['rd'], ", R",instruction['rs'],", R",instruction['rt']
+		return False
+	def INVALID(self, instruction):
+		self.currLineDis = 'Invalid Instruction'
+		return False
+	def SLL(self, instruction): #Could also be NOP, check included
+		if(instruction.word & (2**31 - 1) == 0):
+			self.currLineDis = "NOP"
+		else:
+			self.currLineDis = "SLL\tR",instruction['rd'], ", R",instruction['rt'],", #",instruction['sa']
+		return False
+	def SRL(self, instruction):
+		self.currLineDis = "SRL\tR",instruction['rd'], ", R",instruction['rt'],", #",instruction['sa']
+		return False
+	def ADD(self, instruction):
+		self.currLineDis = "ADD\tR",instruction['rd'], ", R",instruction['rs'],", R",instruction['rt']
+		return False
+	def SUB(self, instruction):
+		self.currLineDis = "SUB\tR",instruction['rd'], ", R",instruction['rs'],", R",instruction['rt']
+		return False
+	def AND(self, instruction):
+		self.currLineDis = "AND\tR",instruction['rd'], ", R",instruction['rs'],", R",instruction['rt']
+		return False
+	def OR(self, instruction) :
+		self.currLineDis = "OR\tR",instruction['rd'], ", R",instruction['rs'],", R",instruction['rt']
+		return False
+	def JR(self, instruction) :
+		self.currLineDis = "JR\tR", instruction['rs']
+		return False
