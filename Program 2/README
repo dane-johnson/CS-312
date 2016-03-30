@@ -1,0 +1,7 @@
+Dane Johnson  33
+Jacob Bacon   06
+Danielle Hunt 31
+
+Python script. Simply run
+
+python mipssim.py -i INPUTFILENAME -o OUTPUTFILENAME
