@@ -46,8 +46,7 @@ class IncorrectIdentifierException(Exception):
 		return self.value + " is not an identifier"
 		
 class Instruction(Word):
-	addr = 0;
-	def __init__(self, word, addr):
+	def __init__(self, word, addr = 0):
 		self.word = Word.convert32BitUnsignedToSigned(word)
 		self.addr = addr
 	def __getitem__(self, index):
