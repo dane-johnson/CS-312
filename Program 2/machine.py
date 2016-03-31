@@ -1,18 +1,48 @@
 from word import *
+import pdb
 
 class Machine:
 	DEFAULT_INIT_PC = 96 #We always start at 96 for some reason
-	def __init__(self, initialAddress = 0):
-		self.initialAddress = initialAddress
+	def __init__(self, fileName):
+		self.fileName = fileName
 		self.register = [0] * 32 #Creates an array of 32 values, initialized at 0 for all
 		self.instructions = []
-		self.PC = DEFAULT_INIT_PC
+		self.PC = Machine.DEFAULT_INIT_PC
 		self.currLineDis = "INVALID"
-		
+	
+	def writeState(self, cycle):
+		str = '=' * 20 + '\n'
+		str += 'cycle:%d %d\t%s\n\n' % (cycle, self.PC, self.currLineDis)
+		str += 'registers:\n'
+		for i, v in enumerate(self.register):
+			if(i % 8 == 0):
+				str += 'r%02d:' % i
+			str += '\t%d' % v
+			if(i % 8 == 7):
+				str += '\n'
+		str += 'data:\n'
+		dataAddr = self.findDataAddress()
+		for i, instruction in enumerate(self.instructions[dataAddr:]):
+			if(i % 8 == 0):
+				str += '%02d:' % instruction.addr
+			str += '\t%d' % instruction.word
+			if(i % 8 == 7):
+				str += '\n'
+		str += '\n'
+		self.file.write(str)
+	
 	def loadInstructions(self, instructions):
 		self.instructions = instructions;
 		
+	def findDataAddress(self):
+		for i, instruction in enumerate(self.instructions):
+			if instruction['op'] == 0b100000 and instruction['func'] == 0b001101:
+				return i + 1
+		return len(instructions)
+		
+		
 	def execute(self, instruction):
+		#print bin(instruction.word) #for debugging
 		op = instruction['op']
 		if op == 0b100000 :# R Type, many cases
 			func = instruction['func']
@@ -35,47 +65,65 @@ class Machine:
 		elif op == 0b101011: return self.SW(instruction)  		#SW
 		else:				 return self.INVALID(instruction)
 	def executeInstructions(self):
-		while(self.register[PC] < self.instructions[-1].addr):
-			i = self.findInstruction(self.register[PC])
-			self.execute(self.instructions[i])
-			self.execute(self.instructions[i])
-			self.register[PC] += 4;
-		self.register[PC] = self.initialAddress;
+		self.file = open(self.fileName, 'w')
+		shouldBreak = False
+		cycle = 0
+		while not shouldBreak:
+			i = self.findInstruction(self.PC)
+			shouldBreak = self.execute(self.instructions[i])
+			self.PC += 4
+			cycle += 1
+			self.writeState(cycle)
+		self.PC = Machine.DEFAULT_INIT_PC
+		self.file.close()
 	def findInstruction(self, addr):
+		#pdb.set_trace()
 		min, max = 0, len(self.instructions) - 1
 		pivot = len(self.instructions) / 2
 		while(pivot >= min and pivot <= max):
 			if(self.instructions[pivot].addr == addr): return pivot
 			elif(self.instructions[pivot].addr > addr): max = pivot - 1
 			else: min = pivot + 1
+			pivot = min + len(self.instructions[min:max + 1]) / 2
 		return -1;
 
 	def SW(self, instruction):
-		self.currLineDis = "SW\tR",instruction['rt'], ", ", instruction['immed'], "(R",instruction['rs'],")"
+		self.currLineDis = "SW\tR" + str(instruction['rt']) + ", " + str(instruction['immed']) + "(R" + str(instruction['rs'])+")"
+		self.instructions[self.findInstruction(instruction['immed'] + self.register[instruction['rs']])].word = self.register[instruction['rt']]
 		return False
 	def LW(self, instruction):
-		self.currLineDis = "LW\tR",instruction['rt'], ", ", instruction['immed'], "(R",instruction['rs'],")"
+		self.currLineDis = "LW\tR"+str(instruction['rt'])+ ", "+ str(instruction['immed'])+ "(R"+str(instruction['rs'])+")"
+		self.register[instruction['rt']] = self.instructions[self.findInstruction(instruction['immed'] + self.register[instruction['rs']])].word
 		return False
 	def ADDI(self, instruction):
-		self.currLineDis = "ADDI\tR",instruction['rt'], ", R",instruction['rs'],", #",instruction['immed'] #Use rt for rd since this is an i type
+		self.currLineDis = "ADDI\tR"+str(instruction['rt'])+ ", R"+str(instruction['rs'])+", #"+str(instruction['immed']) #Use rt for rd since this is an i type
+		self.register[instruction['rs']] += instruction['immed']
 		return False
 	def BEQ(self, instruction):
-		self.currLineDis = "BEQ\tR",instruction['rt'], ", R",instruction['rs'],", #",instruction['immed'] #Use rt for rd since this is an i type
+		self.currLineDis = "BEQ\tR"+str(instruction['rt'])+ ", R"+str(instruction['rs'])+", #",str(instruction['immed']) #Use rt for rd since this is an i type
+		if self.register[instruction['rt']] == self.register[instruction['rs']]:
+			this.PC = str(instruction['immed']) - 4
 		return False
 	def J(self, instruction):
-		self.currLineDis = "J\t#", instruction['addr'] << 2
+		self.currLineDis = "J\t#"+ str(instruction['addr'] << 2)
+		self.PC = (instruction['addr'] << 2) - 4
 		return False
 	def BLTZ(self, instruction):
-		self.currLineDis = "BLTZ\tR",instruction['rs'], ", #",instruction['immed'] << 2
+		self.currLineDis = "BLTZ\tR"+str(instruction['rs'])+ ", #"+str(instruction['immed'] << 2)
+		if self.register[instruction['rs']] < 0:
+			self.PC += (instruction['immed'] << 2)
 		return False
 	def MUL(self, instruction):
-		self.currLineDis = "MUL\tR",instruction['rd'], ", R",instruction['rs'],", R",instruction['rt']
+		self.currLineDis = "MUL\tR"+str(instruction['rd'])+ ", R"+str(instruction['rs'])+", R"+str(instruction['rt'])
+		self.register[instruction['rd']] = self.register[instruction['rs']] * self.register[instruction['rt']]
 		return False
 	def BREAK(self, instruction):
-		self.currLineDis = 'BREAK', file=target_file)
+		self.currLineDis = 'BREAK'
 		return True
 	def MOVZ(self, instruction):
-		self.currLineDis = "MOVZ\tR",instruction['rd'], ", R",instruction['rs'],", R",instruction['rt']
+		self.currLineDis = "MOVZ\tR"+str(instruction['rd'])+ ", R",str(instruction['rs'])+", R",str(instruction['rt'])
+		if self.register[instruction['rt']] == 0:
+			self.register[instruction['rd']] = self.register[instruction['rs']]
 		return False
 	def INVALID(self, instruction):
 		self.currLineDis = 'Invalid Instruction'
@@ -84,23 +132,30 @@ class Machine:
 		if(instruction.word & (2**31 - 1) == 0):
 			self.currLineDis = "NOP"
 		else:
-			self.currLineDis = "SLL\tR",instruction['rd'], ", R",instruction['rt'],", #",instruction['sa']
+			self.currLineDis = "SLL\tR"+str(instruction['rd'])+ ", R"+str(instruction['rt'])+", #"+str(instruction['sa'])
+			self.register[instruction['rd']] = self.register[instruction['rt']] << instruction['sa']
 		return False
 	def SRL(self, instruction):
-		self.currLineDis = "SRL\tR",instruction['rd'], ", R",instruction['rt'],", #",instruction['sa']
+		self.currLineDis = "SRL\tR"+str(instruction['rd'])+ ", R"+str(instruction['rt'])+", #"+str(instruction['sa'])
+		self.register[instruction['rd']] = self.register[instruction['rt']] >> instruction['sa']
 		return False
 	def ADD(self, instruction):
-		self.currLineDis = "ADD\tR",instruction['rd'], ", R",instruction['rs'],", R",instruction['rt']
+		self.currLineDis = "ADD\tR"+str(instruction['rd'])+ ", R"+str(instruction['rs'])+", R",str(instruction['rt'])
+		self.register[instruction['rd']] = self.register[instruction['rs']] + self.register[instruction['rt']]
 		return False
 	def SUB(self, instruction):
-		self.currLineDis = "SUB\tR",instruction['rd'], ", R",instruction['rs'],", R",instruction['rt']
+		self.currLineDis = "SUB\tR"+str(instruction['rd'])+ ", R"+str(instruction['rs'])+", R",str(instruction['rt'])
+		self.register[instruction['rd']] = self.register[instruction['rs']] - self.register[instruction['rt']]
 		return False
 	def AND(self, instruction):
-		self.currLineDis = "AND\tR",instruction['rd'], ", R",instruction['rs'],", R",instruction['rt']
+		self.currLineDis = "AND\tR"+str(instruction['rd'])+ ", R"+str(instruction['rs'])+", R"+str(instruction['rt'])
+		self.register[instruction['rd']] = self.register[instruction['rs']] & self.register[instruction['rt']]
 		return False
 	def OR(self, instruction) :
-		self.currLineDis = "OR\tR",instruction['rd'], ", R",instruction['rs'],", R",instruction['rt']
+		self.currLineDis = "OR\tR"+str(instruction['rd'])+ ", R"+str(instruction['rs'])+", R"+str(instruction['rt'])
+		self.register[instruction['rd']] = self.register[instruction['rs']] | self.register[instruction['rt']]
 		return False
 	def JR(self, instruction) :
-		self.currLineDis = "JR\tR", instruction['rs']
+		self.currLineDis = "JR\tR"+ str(instruction['rs'])
+		self.PC = self.register[instruction['rs']]
 		return False
