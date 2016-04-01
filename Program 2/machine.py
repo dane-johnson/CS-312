@@ -9,6 +9,7 @@ class Machine:
 		self.instructions = []
 		self.PC = Machine.DEFAULT_INIT_PC
 		self.currLineDis = "INVALID"
+		self.printOut = True
 	
 	def writeState(self, cycle):
 		str = '=' * 20 + '\n'
@@ -64,6 +65,7 @@ class Machine:
 		elif op == 0b100011: return self.LW(instruction) 		#LW
 		elif op == 0b101011: return self.SW(instruction)  		#SW
 		else:				 return self.INVALID(instruction)
+		
 	def executeInstructions(self):
 		self.file = open(self.fileName, 'w')
 		shouldBreak = False
@@ -71,11 +73,14 @@ class Machine:
 		while not shouldBreak:
 			i = self.findInstruction(self.PC)
 			shouldBreak = self.execute(self.instructions[i])
+			if(self.printOut):
+				cycle += 1
+				self.writeState(cycle)
 			self.PC += 4
-			cycle += 1
-			self.writeState(cycle)
+			self.printOut = True
 		self.PC = Machine.DEFAULT_INIT_PC
 		self.file.close()
+		
 	def findInstruction(self, addr):
 		#pdb.set_trace()
 		min, max = 0, len(self.instructions) - 1
@@ -97,7 +102,7 @@ class Machine:
 		return False
 	def ADDI(self, instruction):
 		self.currLineDis = "ADDI\tR"+str(instruction['rt'])+ ", R"+str(instruction['rs'])+", #"+str(instruction['immed']) #Use rt for rd since this is an i type
-		self.register[instruction['rs']] += instruction['immed']
+		self.register[instruction['rt']] += instruction['immed']
 		return False
 	def BEQ(self, instruction):
 		self.currLineDis = "BEQ\tR"+str(instruction['rt'])+ ", R"+str(instruction['rs'])+", #",str(instruction['immed']) #Use rt for rd since this is an i type
@@ -127,6 +132,7 @@ class Machine:
 		return False
 	def INVALID(self, instruction):
 		self.currLineDis = 'Invalid Instruction'
+		self.printOut = False
 		return False
 	def SLL(self, instruction): #Could also be NOP, check included
 		if(instruction.word & (2**31 - 1) == 0):
@@ -140,11 +146,11 @@ class Machine:
 		self.register[instruction['rd']] = self.register[instruction['rt']] >> instruction['sa']
 		return False
 	def ADD(self, instruction):
-		self.currLineDis = "ADD\tR"+str(instruction['rd'])+ ", R"+str(instruction['rs'])+", R",str(instruction['rt'])
+		self.currLineDis = "ADD\tR"+str(instruction['rd'])+ ", R"+str(instruction['rs'])+", R"+str(instruction['rt'])
 		self.register[instruction['rd']] = self.register[instruction['rs']] + self.register[instruction['rt']]
 		return False
 	def SUB(self, instruction):
-		self.currLineDis = "SUB\tR"+str(instruction['rd'])+ ", R"+str(instruction['rs'])+", R",str(instruction['rt'])
+		self.currLineDis = "SUB\tR"+str(instruction['rd'])+ ", R"+str(instruction['rs'])+", R"+str(instruction['rt'])
 		self.register[instruction['rd']] = self.register[instruction['rs']] - self.register[instruction['rt']]
 		return False
 	def AND(self, instruction):
