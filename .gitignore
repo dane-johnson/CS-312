@@ -5,3 +5,8 @@ Program 2/*.txt
 #ignore windows and bash scripts
 *.bat
 *.sh
+#ignore .log files
+*.log
+#ignore everything in the 'mark' directory
+Program 2/mark/
+
