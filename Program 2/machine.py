@@ -8,12 +8,13 @@ class Machine:
 		self.register = [0] * 32 #Creates an array of 32 values, initialized at 0 for all
 		self.instructions = []
 		self.PC = Machine.DEFAULT_INIT_PC
+		self.lastPC = -1
 		self.currLineDis = "INVALID"
 		self.printOut = True
 	
 	def writeState(self, cycle):
 		str = '=' * 20 + '\n'
-		str += 'cycle:%d %d\t%s\n\n' % (cycle, self.PC, self.currLineDis)
+		str += 'cycle:%d %d\t%s\n\n' % (cycle, self.lastPC, self.currLineDis)
 		str += 'registers:\n'
 		for i, v in enumerate(self.register):
 			if(i % 8 == 0):
@@ -72,6 +73,7 @@ class Machine:
 		cycle = 0
 		while not shouldBreak:
 			i = self.findInstruction(self.PC)
+			self.lastPC = self.PC
 			shouldBreak = self.execute(self.instructions[i])
 			if(self.printOut):
 				cycle += 1
