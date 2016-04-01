@@ -128,7 +128,7 @@ class Machine:
 		self.currLineDis = 'BREAK'
 		return True
 	def MOVZ(self, instruction):
-		self.currLineDis = "MOVZ\tR"+str(instruction['rd'])+ ", R",str(instruction['rs'])+", R",str(instruction['rt'])
+		self.currLineDis = "MOVZ\tR"+str(instruction['rd'])+ ", R"+str(instruction['rs'])+", R"+str(instruction['rt'])
 		if self.register[instruction['rt']] == 0:
 			self.register[instruction['rd']] = self.register[instruction['rs']]
 		return False
@@ -165,5 +165,5 @@ class Machine:
 		return False
 	def JR(self, instruction) :
 		self.currLineDis = "JR\tR"+ str(instruction['rs'])
-		self.PC = self.register[instruction['rs']]
+		self.PC = self.register[instruction['rs']] - 4
 		return False
