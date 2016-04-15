@@ -6,10 +6,8 @@ class IF (FunctionalUnit):
     FunctionalUnit.__init__(self, next, last)
   def execute(self):
     if self.state == STALLED: return
-    if next.space == 0: return
-    if next.space == 1:
+    if next.size() == 4: return
+    if next.size() == 3:
       #fetch a single instruction
       return
-    if next.space == 2:
-      #fetch 2 instructions
-      return
+    #fetch 2 instructions
