@@ -5,7 +5,11 @@ class FunctionalUnit:
   def __init__(self, last, next):
     self.last = last
     self.next = next
-    self.state = READY
+    self.state = STALLED
   
   def execute(self):
     raise NotImplementedError
+class UnitBuffer:
+  def __init__(self, last, next):
+    self.last = last
+    self.next = next

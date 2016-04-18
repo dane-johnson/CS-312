@@ -1,13 +1,11 @@
-from superscaler_sim.functional_unit import FunctionalUnit, READY, STALLED
+from superscaler_sim.functional_unit import FunctionalUnit, UnitBuffer, READY, STALLED
 
 from collections import deque
 
-class PreIssue(FunctionalUnit):
+class PreIssue(UnitBuffer):
   def __init__(self, last, next):
     FunctionalUnit.__init__(self, last, next)
     self.buffer = deque()
-  def execute(self):
-    pass #do stuff here
   def size(self):
     return len(self.buffer)
  
