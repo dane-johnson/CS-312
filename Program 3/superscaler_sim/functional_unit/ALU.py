@@ -2,19 +2,30 @@ from superscaler_sim.functional_unit import FunctionalUnit, UnitBuffer, READY, S
 
 from collections import deque
 
-class PreALU(UnitBuffer):
+class PreALU(UnitBuffer): #standard FIFO queue
   def __init__(self, last, next):
     UnitBuffer.__init__(self, last, next)
     self.queue = deque()
-class PostALU(UnitBuffer):
+  def __len__(self):
+    return len(self.queue)
+    
+class PostALU(UnitBuffer): #one entry
   def __init__(self, last, next):
     UnitBuffer.__init__(self, last, next):
     self.entry = None
+  def __len__(self):
+    if entry == None: return 0
+    return 1
+    
 class ALU(FunctionalUnit):
   def __init__(self, last, next):
     FunctionalUnit.__init__(self, last, next)
   
   def execute(self):
+    if len(last) == 0:
+      self.state = STALLED
+    else:
+      self.state = READY
     if self.state == STALLED:
       return
     curr = last.queue.pop() #should be a dictionary

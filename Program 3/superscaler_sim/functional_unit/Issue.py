@@ -6,7 +6,7 @@ class PreIssue(UnitBuffer):
   def __init__(self, last, next):
     FunctionalUnit.__init__(self, last, next)
     self.buffer = deque()
-  def size(self):
+  def __len__(self):
     return len(self.buffer)
  
 class Issue(FunctionalUnit):
