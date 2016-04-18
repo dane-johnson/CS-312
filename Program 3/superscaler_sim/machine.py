@@ -11,7 +11,8 @@ class Machine:
     self.pc = [96]
     self.registers = [0] * 32
     self.cache = Cache()
-    self.cycle = 0
+    self.cycleCount = 0
+	self.shouldBreak = False
     
     self.preAlu = PreALU()
     self.postAlu = PostALU()
@@ -28,5 +29,21 @@ class Machine:
     
     self.fetch = IF(cache = self.cache, pc = self.pc, registers = self.registers, preIssue = self.preIssue)
   def cycle(self):
+	#execute in reverse order
     self.wb.execute()
-    self.
+    self.mem.execute()
+	self.alu.execute()
+	self.issue.execute()
+	self.fetch.execute()
+	cycleCount += 1 #increment counter
+  def executeMix(self, f = None, *args): #f is a function to be run on the machine between each cycle
+    #set back to the starts
+	self.pc = [96]
+	registers = [0] * 32
+	self.cache = Cache()
+	self.cycleCount = 0
+	self.shouldBreak = False
+	while not self.shouldBreak:
+	  if f != None:
+	    f(args)
+	  self.cycle()

@@ -28,11 +28,16 @@ class ALU(FunctionalUnit):
       self.state = READY
     if self.state == STALLED:
       return
-    curr = last.queue.pop() #should be a dictionary
+	  
+    curr = last.queue.pop() #should be a dictionary, popping clears the entry
     out = {} #blank dictionary
-		op = curr['op']
+	op = curr['op']
     operands = curr['operands']
+	
+	#just pass the instruction on at least
     out['dest'] = curr['dest']
+	out['instruction'] = curr['instruction']
+	
     if op == 'add':
       out['data'] = operands[0] + operands[1] #add the operands
     elif op == 'sub':
@@ -44,8 +49,7 @@ class ALU(FunctionalUnit):
     elif op == 'movz':
       if operand[0] == 0: #check and be sure equal to zero
         out['data'] = operands[1] #move the data
-      else: #do not move the data, TODO
-        pass
+      else: pass #do not move the data
     elif op == 'sll':
       out['data'] = operands[0] << operands[1] #should be the shift amount
     elif op == 'srl':
