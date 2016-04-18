@@ -3,26 +3,26 @@ from superscaler_sim.functional_unit import FunctionalUnit, UnitBuffer, READY, S
 from collections import deque
 
 class PreALU(UnitBuffer): #standard FIFO queue
-  def __init__(self, last, next):
-    UnitBuffer.__init__(self, last, next)
+  def __init__(self):
     self.queue = deque()
   def __len__(self):
     return len(self.queue)
     
 class PostALU(UnitBuffer): #one entry
-  def __init__(self, last, next):
-    UnitBuffer.__init__(self, last, next):
+  def __init__(self):
     self.entry = None
   def __len__(self):
     if entry == None: return 0
     return 1
     
 class ALU(FunctionalUnit):
-  def __init__(self, last, next):
-    FunctionalUnit.__init__(self, last, next)
+  def __init__(self, preAlu = None, postAlu = None):
+    FunctionalUnit.__init__(self)
+    self.preAlu = preAlu
+    self.postAlu = postAlu
   
   def execute(self):
-    if len(last) == 0:
+    if len(self.preAlu) == 0:
       self.state = STALLED
     else:
       self.state = READY
@@ -53,4 +53,4 @@ class ALU(FunctionalUnit):
     elif op == 'mul':
       out['data'] = operands[0] * operands[1] #multiply the operands
     
-    next.entry = out #send the computed data to the post-alu buffer
+    postAlu.entry = out #send the computed data to the post-alu buffer
