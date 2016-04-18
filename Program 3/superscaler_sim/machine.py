@@ -11,6 +11,7 @@ class Machine:
     self.pc = [96]
     self.registers = [0] * 32
     self.cache = Cache()
+    self.cycle = 0
     
     self.preAlu = PreALU()
     self.postAlu = PostALU()
@@ -26,3 +27,6 @@ class Machine:
     self.wb = WB(registers = self.registers, preAlu = self.preAlu, postAlu = self.PostALU)
     
     self.fetch = IF(cache = self.cache, pc = self.pc, registers = self.registers, preIssue = self.preIssue)
+  def cycle(self):
+    self.wb.execute()
+    self.
