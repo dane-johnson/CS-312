@@ -16,4 +16,10 @@ class Issue(FunctionalUnit):
     self.preAlu = preAlu
   
   def execute(self):
-    pass #DO SOMETHING
+    #set issued instructions = 0
+    #go into a for loop that simply iterates twice
+      #go into a for loop over the stack
+        #if issued instructions == 2 > break outer loop
+        #peek at the next instruction, determine op code, registers
+        #Check for structural hazards, WAW hazards, WAR hazards, RAW hazards, previous sw issued 
+      

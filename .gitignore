@@ -9,4 +9,6 @@ Program 2/*.txt
 *.log
 #ignore everything in the 'mark' directory
 Program 2/mark/
+#ignore Program 3 test file
+Program 3/Test.py
 
