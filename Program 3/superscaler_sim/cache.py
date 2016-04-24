@@ -7,12 +7,13 @@ class CacheMissError(Exeption):
 class Cache:
   def __init__(self, memory):
     self.sets = [Set(), Set(), Set(), Set()]
-    self.missed = []
+    self.missed = deque()
     
   def memoryRead(self): #call once a cycle
     if len(missed) != 0:
       #get word from memory
       self.loadWord(missed.pop())
+      
   def getWord(self, address):
     #calculate wo
     wo = (address >> 2) & 1
@@ -20,15 +21,17 @@ class Cache:
     index = (address >> 3) & 3
     #calculate the tag
     tag = address >> 5
-    
-    entry = sets[index].entry[set[index].lru]
+    set = self.sets[index]
+    entry = set.entries[set.lru]
     if entry.v = 1:
+    #if it is in cache return the word
       return entry[wo]
     else:
-      missed = address
-      raise CacheMissError(address)
-    #if it is in cache return the word
     #if not in cache, throw a cache miss exception
+      missed.appendleft(address)
+      raise CacheMissError(address)
+    
+    
   def loadWord(self, address):
     #calculate wo
     wo = (address >> 2) & 1
@@ -51,8 +54,44 @@ class Cache:
     entry.words = words
     #flip LRU bit on that entry
     set.lru = set.lru ^ 1
+  
+  def storeWord(self, address, value):
+    #calculate wo
+    wo = (address >> 2) & 1
+    #calculate index
+    index = (address >> 3) & 3
+    #calculate the tag
+    tag = address >> 5
+    set = self.sets[index]
+    entry = set.entries[set.lru]
     
+    if not entry.v or entry.tag != tag:
+      #cache miss 
+      missed.appendleft(address)
+      raise CacheMissError(address)
+    else:
+      #update the value
+      entry.words[wo] = value
+      #set the valid and dirty bits
+      entry.v = 1
+      entry.d = 1
+      #update the lru
+      set.lru ^ 1
     
+  def writeToMemory(self)
+    #loop through all of cache
+    for i, set in enumerate(self.sets):
+      for j, entry in enumerate(set.entries):
+        if entry.d and entry.v:
+          #calculate address
+          address = 0
+          address += entry.tag << 5
+          address += i << 3 #index
+          #write data back
+          memory[address] = entry.words[0]
+          memory[address + 4] = entry.words[1]
+          #set dirty bit back to zero
+          entry.d = 0
 class Set:
   def __init__(self):
     self.lru = 0

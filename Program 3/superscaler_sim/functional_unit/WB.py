@@ -13,9 +13,9 @@ class WB(FunctionalUnit):
       if len(self.postAlu) != 0:
         curr = self.postAlu.entry
         self.postAlu.entry = None #clear the buffer
-        registers[curr['dest']] = curr['data']
+        self.registers[curr['dest']] = curr['data']
       if len(self.postMem) != 0:
         curr = self.postMem.entry
         self.postMem = None #clear the buffer
-        registers[curr['dest']] = curr['data']
+        self.registers[curr['dest']] = curr['data']
       

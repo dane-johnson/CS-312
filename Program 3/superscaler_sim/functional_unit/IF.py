@@ -50,7 +50,9 @@ class IF (FunctionalUnit):
         self.trigger[0] = True
         return
 		elif op == 0b100001: pass		#BLTZ
-		elif op == 0b100010: pass		#J
+		elif op == 0b100010: #J
+      self.pc[0] = instruction['addr'] << 2
+      return
 		elif op == 0b100100: pass		#BEQ
 		else: 
       self.pc[0] += 4

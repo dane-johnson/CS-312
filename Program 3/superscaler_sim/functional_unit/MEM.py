@@ -1,4 +1,5 @@
 from superscaler_sim.functional_unit import FunctionalUnit, UnitBuffer, READY, STALLED
+from superscaler_sim.cache import CacheMissError
 
 from collections import deque
 
@@ -23,4 +24,27 @@ class MEM(FunctionalUnit):
     self.postMem = postMem
   
   def execute(self):
-    pass #at this point, no idea
+    if len(self.preMem) == 0 and len(self.postMem) == 0:
+      self.state = STALLED
+    else:
+      self.state = READY
+    if self.state == READY:
+      curr = self.preMem.queue[-1]
+      op = curr['op']
+      
+      if op == 'sw':
+        try:
+          self.cache.storeWord(curr['addr'], curr['data')
+          self.preMem.pop()
+        except CacheMissError:
+          return #well get it next time
+      elif op == 'lw':
+        try:
+          dict = {}
+          dict['instruction'] = curr['instruction'] #forward the instruction to the post memoryview
+          dict['data'] = cache.getWord(curr['addr'])
+          dict['dest'] = curr['dest']
+          self.preMem.pop()
+          self.postMem.entry = dict
+        except CacheMissError:
+          return #don't pop, well get it next time
