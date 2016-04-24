@@ -1,5 +1,3 @@
-from superscaler_sim.word import Instruction
-
 def HazardUnit:
   def __init__(self):
     self.active = []

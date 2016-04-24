@@ -16,10 +16,11 @@ class PostALU(UnitBuffer): #one entry
     return 1
     
 class ALU(FunctionalUnit):
-  def __init__(self, preAlu = None, postAlu = None):
+  def __init__(self, hazard, preAlu = None, postAlu = None):
     FunctionalUnit.__init__(self)
     self.preAlu = preAlu
     self.postAlu = postAlu
+    self.hazard = hazard
   
   def execute(self):
     if len(self.preAlu) == 0:
@@ -35,10 +36,12 @@ class ALU(FunctionalUnit):
     operands = curr['operands']
 	
 	#just pass the instruction on at least
-    out['dest'] = curr['dest']
+ 
+  out['dest'] = curr['dest']
+  
 	out['instruction'] = curr['instruction']
 	
-    if op == 'add':
+    if op == 'add' or op == 'addi':
       out['data'] = operands[0] + operands[1] #add the operands
     elif op == 'sub':
       out['data'] = operands[0] - operands[1] #subtract the operands
@@ -49,7 +52,7 @@ class ALU(FunctionalUnit):
     elif op == 'movz':
       if operand[0] == 0: #check and be sure equal to zero
         out['data'] = operands[1] #move the data
-      else: pass #do not move the data
+      else: self.hazard.complete(curr['instruction']) #do not move the data
     elif op == 'sll':
       out['data'] = operands[0] << operands[1] #should be the shift amount
     elif op == 'srl':

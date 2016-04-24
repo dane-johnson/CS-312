@@ -4,28 +4,31 @@ from superscaler_sim.functional_unit.ALU import PreALU, ALU, PostALU
 from superscaler_sim.functional_unit.Issue import PreIssue, Issue
 from superscaler_sim.functional_unit.MEM import PreMEM, MEM, PostMEM
 from superscaler_sim.cache import Cache
+from superscaler_sim.memory import Memory
+from superscaler_sim.hazard import HazardUnit
 
 class Machine:
   def __init__(self, instructions):
-    self.instructions = instructions
+    self.memory = Memory(instructions)
     self.pc = [96]
+    self.hazard = HazardUnit()
     self.registers = [0] * 32
-    self.cache = Cache()
+    self.cache = Cache(self.memory)
     self.cycleCount = 0
     self.shouldBreak = [False]
     
     self.preAlu = PreALU()
     self.postAlu = PostALU()
-    self.alu = ALU(preAlu = self.preAlu, postAlu = self.postAlu)
+    self.alu = ALU(hazard = self.hazard, preAlu = self.preAlu, postAlu = self.postAlu)
     
     self.preMem = PreMEM()
     self.postMem = PostMEM()
-    self.mem = MEM(cache = self.cache, preMem = self.preMem, postMem = self.postMem)
+    self.mem = MEM(cache = self.cache, hazard = self.hazard, preMem = self.preMem, postMem = self.postMem)
     
     self.preIssue = PreIssue()
-    self.issue = Issue(registers = self.registers, preIssue = self.preIssue, preMem = self.preMem, preAlu = self.preAlu)
+    self.issue = Issue(registers = self.registers, hazard = self.hazard, preIssue = self.preIssue, preMem = self.preMem, preAlu = self.preAlu)
     
-    self.wb = WB(registers = self.registers, preAlu = self.preAlu, postAlu = self.PostALU)
+    self.wb = WB(registers = self.registers, hazard = self.hazard, preAlu = self.preAlu, postAlu = self.PostALU)
     
     self.fetch = IF(cache = self.cache, pc = self.pc, registers = self.registers, preIssue = self.preIssue, trigger = self.shouldBreak)
   def cycle(self):
