@@ -20,18 +20,18 @@ class Machine:
     
     self.preAlu = PreALU()
     self.postAlu = PostALU()
-    self.alu = ALU(hazard = self.hazard, preAlu = self.preAlu, postAlu = self.postAlu)
+    self.alu = ALU(hazard = self.hazard, registers = self.registers, preAlu = self.preAlu, postAlu = self.postAlu)
     
     self.preMem = PreMEM()
     self.postMem = PostMEM()
-    self.mem = MEM(cache = self.cache, hazard = self.hazard, preMem = self.preMem, postMem = self.postMem)
+    self.mem = MEM(cache = self.cache, registers = self.registers, hazard = self.hazard, preMem = self.preMem, postMem = self.postMem)
     
     self.preIssue = PreIssue()
     self.issue = Issue(registers = self.registers, hazard = self.hazard, preIssue = self.preIssue, preMem = self.preMem, preAlu = self.preAlu)
     
     self.wb = WB(registers = self.registers, hazard = self.hazard, postMem = self.postMem, postAlu = self.postAlu)
     
-    self.fetch = IF(cache = self.cache, pc = self.pc, registers = self.registers, preIssue = self.preIssue, trigger = self.shouldBreak)
+    self.fetch = IF(cache = self.cache, pc = self.pc, registers = self.registers, preIssue = self.preIssue, trigger = self.shouldBreak, hazard = self.hazard)
   def cycle(self):
   #execute in reverse order
     self.cache.memoryRead()
@@ -43,7 +43,9 @@ class Machine:
     self.cycleCount += 1 #increment counter
   def executeMix(self, f = None, *args): #f is a function to be run on the machine between each cycle
     self.cycleCount = 0
-    while not self.shouldBreak[0]:
+    while not self.shouldBreak[0] or len(self.hazard) != 0:
+      self.cycle()
+      if self.shouldBreak[0] and len(self.hazard) == 0:
+        self.cache.writeToMemory()
       if f != None:
         f(*args)
-      self.cycle()

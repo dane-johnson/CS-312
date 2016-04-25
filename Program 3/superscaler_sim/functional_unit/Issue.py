@@ -3,6 +3,7 @@ from superscaler_sim.functional_unit import FunctionalUnit, UnitBuffer, READY, S
 from superscaler_sim.word import Instruction
 
 from collections import deque
+from pdb import set_trace as bp
 
 class PreIssue(UnitBuffer):
   def __init__(self):
@@ -52,7 +53,7 @@ class Issue(FunctionalUnit):
       curr['op'] = 'mul'
     elif op == 0b101000:	#ADDI
       curr['op'] = 'addi'
-      curr['dest'] = instruction['rd']
+      curr['dest'] = instruction['rt']
       curr['operands'] = (instruction['rs'], instruction['immed'])
       return curr
     elif op == 0b100011:	#LW
@@ -62,7 +63,7 @@ class Issue(FunctionalUnit):
       return curr
     else:	#SW
       curr['op'] = 'sw'
-      curr['data'] = self.registers[instruction['rt']]
+      curr['operands'] = (instruction['rt'],)
       curr['addr'] = instruction['rs'] + instruction['immed']
       return curr
 
@@ -75,18 +76,21 @@ class Issue(FunctionalUnit):
     self.registers = registers
   
   def execute(self):
+    #bp()
     #set issued instructions = 0
     nIssued = 0
     #go into a for loop that simply iterates twice
     for i in range(2):
       #go into a for loop over the stack
-      for instruction in reversed(self.preIssue.buffer):
+      over = list(self.preIssue.buffer)[:]
+      for instruction in over:
+        #bp()
         #if issued instructions == 2 > break outer loop
         if nIssued == 2: break
         #peek at the next instruction, determine op code, registers, construct the instruction
         curr = self.buildInstruction(instruction)
         #Check for structural hazards, WAW hazards, WAR hazards, RAW hazards, previous sw issued 
-        if curr['op'] == 'lw' or curr['op'] == 'sw' and len(self.preMem) >= 4:
+        if (curr['op'] == 'lw' or curr['op'] == 'sw') and len(self.preMem) >= 4:
           #preMem full
           self.hazard.noIssued.append(curr)
           continue
@@ -101,11 +105,16 @@ class Issue(FunctionalUnit):
           #No problems, issue the instruction
           if curr['op'] == 'lw' or curr['op'] == 'sw':
             self.preMem.queue.appendleft(curr)
+            self.preIssue.buffer.remove(instruction)
+            self.hazard.purgeNoIssued()
           else:
             self.preAlu.queue.appendleft(curr)
+            self.preIssue.buffer.remove(instruction)
+            self.hazard.purgeNoIssued()
           self.hazard.active.append(curr)
           nIssued += 1
       else:
         #exited normally, continue before we hit the break
         continue
       break
+    self.hazard.purgeNoIssued()

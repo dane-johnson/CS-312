@@ -1,5 +1,6 @@
 from __future__ import print_function
 from superscaler_sim.word import Instruction
+from superscaler_sim.word import Word
 target_file = None;
 def disassembleInstruction(instruction):
   op = instruction['op']
@@ -92,7 +93,7 @@ def JR(instruction) :
 def displayDataValue(word, index):
   for i in xrange(31, -1, -1): #decrement value
     print((word & 2**i) >> i, end="", file=target_file)
-  print("\t",(index * 4 + 96),"\t" , word, sep = "", file=target_file)
+  print("\t",(index * 4 + 96),"\t" , Word.convert32BitUnsignedToSigned(word), sep = "", file=target_file)
 def printInstructionAsBinary(instruction, index):
   for i in xrange(31, -1, -1): #decrement value
     print((instruction.word & 2**i) >> i, end=" " if (i == 31 or i == 26 or i == 21 or i == 16 or i == 11 or i == 6) else "", file=target_file)

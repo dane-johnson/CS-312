@@ -1,7 +1,11 @@
+from pdb import set_trace as bp
+
 class HazardUnit:
   def __init__(self):
     self.active = []
     self.noIssued = []
+  def __len__(self):
+    return len(self.active) + len(self.noIssued)
   def purgeNoIssued(self):
     self.noIssued = []
   def complete(self, instruction):
@@ -48,7 +52,7 @@ class HazardUnit:
       try:
         operands = i['operands']
         for j in operands:
-          if j['dest'] == j:
+          if i['dest'] == j:
             #hazards, don't execute
             return True
       except KeyError:
@@ -72,4 +76,5 @@ class HazardUnit:
         return True
     return False
   def checkAll(self, curr):
+    #bp()
     return self.checkWAW(curr) or self.checkRAW(curr) or self.checkWAR(curr) or self.checkLoads(curr) or self.checkStores(curr)

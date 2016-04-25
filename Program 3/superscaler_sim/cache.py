@@ -1,4 +1,5 @@
 from collections import deque
+from pdb import set_trace as bp
 
 class CacheMissError(BaseException):
   def __init__(self, address):
@@ -26,6 +27,7 @@ class Cache:
       self.loadWord(self.missed.pop())
       
   def getWord(self, address):
+    #bp()
     #calculate wo
     wo = (address >> 2) & 1
     #calculate index
@@ -34,7 +36,7 @@ class Cache:
     tag = address >> 5
     set = self.sets[index]
     for entry in set.entries:
-      if entry.v == 1:
+      if entry.v == 1 and entry.tag == tag:
       #if it is in cache return the word
         return entry.words[wo]
     else:
@@ -74,20 +76,20 @@ class Cache:
     #calculate the tag
     tag = address >> 5
     set = self.sets[index]
-    entry = set.entries[set.lru]
     
-    if not entry.v or entry.tag != tag:
-      #cache miss 
+    for entry in set.entries:
+      if entry.v and entry.tag == tag:
+        break
+    else:
       self.missed.appendleft(address)
       raise CacheMissError(address)
-    else:
-      #update the value
-      entry.words[wo] = value
-      #set the valid and dirty bits
-      entry.v = 1
-      entry.d = 1
-      #update the lru
-      set.lru ^ 1
+    #update the value
+    entry.words[wo] = value
+    #set the valid and dirty bits
+    entry.v = 1
+    entry.d = 1
+    #update the lru
+    set.lru ^ 1
     
   def writeToMemory(self):
     #loop through all of cache
@@ -99,8 +101,8 @@ class Cache:
           address += entry.tag << 5
           address += i << 3 #index
           #write data back
-          memory[address] = entry.words[0]
-          memory[address + 4] = entry.words[1]
+          self.memory[address] = entry.words[0]
+          self.memory[address + 4] = entry.words[1]
           #set dirty bit back to zero
           entry.d = 0
 class Set:
