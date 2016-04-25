@@ -1,4 +1,4 @@
-def HazardUnit:
+class HazardUnit:
   def __init__(self):
     self.active = []
     self.noIssued = []
@@ -51,9 +51,9 @@ def HazardUnit:
           if j['dest'] == j:
             #hazards, don't execute
             return True
-        except KeyError:
-          #no operands in this one, no problem
-          continue
+      except KeyError:
+        #no operands in this one, no problem
+        continue
     return False
   def checkLoads(self, curr):
     if 'lw' != curr['op']:

@@ -13,7 +13,7 @@ class PostMEM(UnitBuffer): #one entry output
   def __init__(self):
     self.entry = None
   def __len__(self):
-    if entry == None: return 0
+    if self.entry == None: return 0
     return 1
 
 class MEM(FunctionalUnit):
@@ -35,7 +35,7 @@ class MEM(FunctionalUnit):
       
       if op == 'sw':
         try:
-          self.cache.storeWord(curr['addr'], curr['data')
+          self.cache.storeWord(curr['addr'], curr['data'])
           self.preMem.pop()
           self.hazard.complete(curr['instruction'])
         except CacheMissError:

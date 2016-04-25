@@ -1,4 +1,6 @@
-class CacheMissError(Exeption):
+from collections import deque
+
+class CacheMissError(BaseException):
   def __init__(self, address):
     self.address = address
   def __str__(self):
@@ -23,7 +25,7 @@ class Cache:
     tag = address >> 5
     set = self.sets[index]
     entry = set.entries[set.lru]
-    if entry.v = 1:
+    if entry.v == 1:
     #if it is in cache return the word
       return entry[wo]
     else:
@@ -78,7 +80,7 @@ class Cache:
       #update the lru
       set.lru ^ 1
     
-  def writeToMemory(self)
+  def writeToMemory(self):
     #loop through all of cache
     for i, set in enumerate(self.sets):
       for j, entry in enumerate(set.entries):

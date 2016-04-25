@@ -1,7 +1,8 @@
 #ignore generated .pyc files
 *.pyc
-#ignore generated .txt files in Program 2
+#ignore generated .txt files in Program 2 and 3
 Program 2/*.txt
+Program 3/*.txt
 #ignore windows and bash scripts
 *.bat
 *.sh

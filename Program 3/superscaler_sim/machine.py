@@ -3,6 +3,7 @@ from superscaler_sim.functional_unit.IF import IF
 from superscaler_sim.functional_unit.ALU import PreALU, ALU, PostALU
 from superscaler_sim.functional_unit.Issue import PreIssue, Issue
 from superscaler_sim.functional_unit.MEM import PreMEM, MEM, PostMEM
+from superscaler_sim.functional_unit.WB import WB
 from superscaler_sim.cache import Cache
 from superscaler_sim.memory import Memory
 from superscaler_sim.hazard import HazardUnit
@@ -28,20 +29,20 @@ class Machine:
     self.preIssue = PreIssue()
     self.issue = Issue(registers = self.registers, hazard = self.hazard, preIssue = self.preIssue, preMem = self.preMem, preAlu = self.preAlu)
     
-    self.wb = WB(registers = self.registers, hazard = self.hazard, preAlu = self.preAlu, postAlu = self.PostALU)
+    self.wb = WB(registers = self.registers, hazard = self.hazard, postMem = self.postMem, postAlu = self.postAlu)
     
     self.fetch = IF(cache = self.cache, pc = self.pc, registers = self.registers, preIssue = self.preIssue, trigger = self.shouldBreak)
   def cycle(self):
-	#execute in reverse order
+  #execute in reverse order
     self.wb.execute()
     self.mem.execute()
     self.alu.execute()
     self.issue.execute()
     self.fetch.execute()
-    cycleCount += 1 #increment counter
+    self.cycleCount += 1 #increment counter
   def executeMix(self, f = None, *args): #f is a function to be run on the machine between each cycle
     self.cycleCount = 0
     while not self.shouldBreak[0]:
       if f != None:
-        f(args)
+        f(*args)
       self.cycle()

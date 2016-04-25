@@ -54,7 +54,7 @@ class Issue(FunctionalUnit):
     elif op == 0b101000:	#ADDI
       curr['op'] = 'addi'
       curr['dest'] = instruction['rd']
-      curr['operands'] = (instruction['rs'], instruction['immed')
+      curr['operands'] = (instruction['rs'], instruction['immed'])
       return curr
     elif op == 0b100011:	#LW
       curr['op'] = 'lw'
@@ -98,7 +98,7 @@ class Issue(FunctionalUnit):
         if self.hazard.checkAll(curr):
           hazard.noIssued.append(curr)
           continue
-        else
+        else:
           #No problems, issue the instruction
           if curr['op'] == 'lw' or curr['op'] == 'sw':
             self.preMem.queue.appendleft(curr)
