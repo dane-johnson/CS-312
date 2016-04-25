@@ -10,11 +10,20 @@ class Cache:
   def __init__(self, memory):
     self.sets = [Set(), Set(), Set(), Set()]
     self.missed = deque()
+    self.memory = memory
+  
+  def __str__(self):
+    out = ''
+    for i, k in enumerate(self.sets):
+      out += '\tSet %d: LRU=%d' % (i, k.lru) + '\n'
+      for j, l in enumerate(k.entries):
+        out += '\tEntry %d: [(%d, %d, %d,)<%s,%s>]' % (j, l.v, l.d, l.tag, bin(l.words[0]), bin(l.words[1])) + '\n'
+    return out
     
   def memoryRead(self): #call once a cycle
-    if len(missed) != 0:
+    if len(self.missed) != 0:
       #get word from memory
-      self.loadWord(missed.pop())
+      self.loadWord(self.missed.pop())
       
   def getWord(self, address):
     #calculate wo
@@ -24,13 +33,13 @@ class Cache:
     #calculate the tag
     tag = address >> 5
     set = self.sets[index]
-    entry = set.entries[set.lru]
-    if entry.v == 1:
-    #if it is in cache return the word
-      return entry[wo]
+    for entry in set.entries:
+      if entry.v == 1:
+      #if it is in cache return the word
+        return entry.words[wo]
     else:
     #if not in cache, throw a cache miss exception
-      missed.appendleft(address)
+      self.missed.appendleft(address)
       raise CacheMissError(address)
     
     
@@ -44,10 +53,10 @@ class Cache:
     #go into memery and find the address
     #if wo == 0, also fetch address + 4
     if wo == 0:
-      words = [memory[address], memory[address + 4]]
+      words = [self.memory[address], self.memory[address + 4]]
     #else fetch address - 4
     else:
-      words = [memory[address - 4], memory[address]]
+      words = [self.memory[address - 4], self.memory[address]]
     #put into LRU entry in the corresponding set
     set = self.sets[index]
     entry = set.entries[set.lru]
@@ -69,7 +78,7 @@ class Cache:
     
     if not entry.v or entry.tag != tag:
       #cache miss 
-      missed.appendleft(address)
+      self.missed.appendleft(address)
       raise CacheMissError(address)
     else:
       #update the value

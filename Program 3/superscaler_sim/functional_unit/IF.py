@@ -11,33 +11,35 @@ class IF (FunctionalUnit):
     self.preIssue = preIssue
     self.trigger = trigger
   def execute(self):
-    
     if self.state == STALLED:
       self.state = READY
-      return
     if len(self.preIssue) == 4: return
     if len(self.preIssue) == 3:
       #fetch a single instruction
       try:
         self.fetch()
-      except CacheMissException:
+      except CacheMissError:
         self.state = STALLED
+      except Exception:
+        raise
       finally:
         return
     #fetch 2 instructions
     try:
       self.fetch()
       self.fetch()
-    except CacheMissException:
+    except CacheMissError:
       self.state = STALLED
-    finally:
-      return
+      return 
+    except TypeError:
+      raise
   def fetch(self):
-    word = cache.getWord(self.pc[0])
+    word = self.cache.getWord(self.pc[0])
     #check if its valid
     if word >> 31 > 0:
+      self.pc[0] += 4
       return #invalid instruction
-    instruction = Instruction(word, addr)
+    instruction = Instruction(word)
     op = instruction['op']
     #check if it is a branch
     if op == 0b100000 :# R Type, many cases
@@ -45,6 +47,8 @@ class IF (FunctionalUnit):
       if func == 0b000000:
         if instruction.word & (2**31 - 1) == 0: # NOP
           self.pc[0] += 4
+        else:
+          self.pc += 4
       elif func == 0b001000:  # JR
         self.pc[0] = instruction['rs']
       elif func == 0b001101: #BREAK
@@ -63,6 +67,6 @@ class IF (FunctionalUnit):
       else:
         self.pc[0] += 4
     else:
-      preIssue.append(word)
+      self.preIssue.buffer.append(word)
       self.pc[0] += 4
     

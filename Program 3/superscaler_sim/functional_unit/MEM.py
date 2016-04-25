@@ -36,17 +36,21 @@ class MEM(FunctionalUnit):
       if op == 'sw':
         try:
           self.cache.storeWord(curr['addr'], curr['data'])
-          self.preMem.pop()
+          self.preMem.queue.pop()
           self.hazard.complete(curr['instruction'])
         except CacheMissError:
           return #well get it next time
+        except Exception:
+          raise
       elif op == 'lw':
         try:
           dict = {}
           dict['instruction'] = curr['instruction'] #forward the instruction to the post memoryview
           dict['data'] = cache.getWord(curr['addr'])
           dict['dest'] = curr['dest']
-          self.preMem.pop()
+          self.preMem.queue.pop()
           self.postMem.entry = dict
         except CacheMissError:
           return #don't pop, well get it next time
+        except Exception:
+          raise

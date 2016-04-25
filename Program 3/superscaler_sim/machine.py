@@ -34,6 +34,7 @@ class Machine:
     self.fetch = IF(cache = self.cache, pc = self.pc, registers = self.registers, preIssue = self.preIssue, trigger = self.shouldBreak)
   def cycle(self):
   #execute in reverse order
+    self.cache.memoryRead()
     self.wb.execute()
     self.mem.execute()
     self.alu.execute()

@@ -11,10 +11,9 @@ class PreIssue(UnitBuffer):
     return len(self.buffer)
  
 class Issue(FunctionalUnit):
-  @staticmethod
-  def buildInstruction(word):
+  def buildInstruction(self, word):
     #define some helper functions
-    def shift(curr, instuction):
+    def shift(curr, instruction):
       curr['operands'] = (instruction['rt'], instruction['sa'])
       curr['dest'] = instruction['rd']
       return curr
@@ -22,7 +21,7 @@ class Issue(FunctionalUnit):
       curr['operands'] = (instruction['rt'], instruction['rs'])
       curr['dest'] = instruction['rd']
       return curr
-    instuction = Instruction(word)
+    instruction = Instruction(word)
     curr = {}
     curr['instruction'] = word
     op = instruction['op']
@@ -63,7 +62,7 @@ class Issue(FunctionalUnit):
       return curr
     else:	#SW
       curr['op'] = 'sw'
-      curr['data'] = registers[instruction['rt']]
+      curr['data'] = self.registers[instruction['rt']]
       curr['addr'] = instruction['rs'] + instruction['immed']
       return curr
 
@@ -85,7 +84,7 @@ class Issue(FunctionalUnit):
         #if issued instructions == 2 > break outer loop
         if nIssued == 2: break
         #peek at the next instruction, determine op code, registers, construct the instruction
-        curr = Issue.buildInstruction(instruction)
+        curr = self.buildInstruction(instruction)
         #Check for structural hazards, WAW hazards, WAR hazards, RAW hazards, previous sw issued 
         if curr['op'] == 'lw' or curr['op'] == 'sw' and len(self.preMem) >= 4:
           #preMem full
@@ -96,7 +95,7 @@ class Issue(FunctionalUnit):
           self.hazard.noIssued.append(curr)
           continue
         if self.hazard.checkAll(curr):
-          hazard.noIssued.append(curr)
+          self.hazard.noIssued.append(curr)
           continue
         else:
           #No problems, issue the instruction
@@ -104,7 +103,7 @@ class Issue(FunctionalUnit):
             self.preMem.queue.appendleft(curr)
           else:
             self.preAlu.queue.appendleft(curr)
-          hazard.active.append(curr)
+          self.hazard.active.append(curr)
           nIssued += 1
       else:
         #exited normally, continue before we hit the break
