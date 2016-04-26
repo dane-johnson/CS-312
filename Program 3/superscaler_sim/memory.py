@@ -1,3 +1,4 @@
+from superscaler_sim.word import Word
 class Memory:
   def __init__(self, instructions):
     self.instructions = instructions

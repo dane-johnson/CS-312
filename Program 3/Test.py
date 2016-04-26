@@ -1,11 +1,12 @@
 from superscaler_sim.machine import Machine
-import superscaler_sim.output as out
+from superscaler_sim.output import output as out
+import disassembler
 
 import os
 import struct
 
 def main():
-  inputfilename = 'test1.bin'
+  inputfilename = 't2.bin'
   infile = open(inputfilename, 'rb')
   infileLen = os.stat(inputfilename)[6]
   infileWords = infileLen / 4
@@ -13,12 +14,16 @@ def main():
   instructions = []
   for i in range(infileWords):
     instructions.append(struct.unpack('>I', infile.read(4))[0])
-  
   mips = Machine(instructions)
   
-  outputfilename = 'test1_sim.txt'
+  with open('t2_dis.txt', 'wt') as f:
+    disassembler.target_file = f
+    disassembler.disassembleSet(instructions)
+  
+  
+  outputfilename = 't2_pipeline.txt'
   outputfile = open(outputfilename, 'wt')
-  mips.executeMix()
+  mips.executeMix(out, mips, outputfile)
   outputfile.close()
 
 if __name__ == '__main__':

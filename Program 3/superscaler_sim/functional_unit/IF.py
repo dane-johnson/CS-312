@@ -47,7 +47,7 @@ class IF (FunctionalUnit):
         if instruction.word & (2**31 - 1) == 0: # NOP
           self.pc[0] += 4
         else:
-          self.pc += 4
+          self.pc[0] += 4
       elif func == 0b001000:  # JR
         if len(self.hazard) == 0:
           self.pc[0] = instruction['rs']

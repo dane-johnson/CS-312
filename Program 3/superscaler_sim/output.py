@@ -23,7 +23,7 @@ def output(machine, file): #file should be an open, write textually file
   p('Pre_ALU Queue:')
   for i in range(2):
     if i < len(machine.preAlu):
-      k = machine.preAlu.queue[(i+1) * -1]['instruction']
+      k = machine.preAlu.queue[(i + 1) * -1]['instruction']
       p(('\tEntry %d:\t' % i)+'['+dissassemble(k)+']')
     else :
       p(('\tEntry %d:\t') %i)
@@ -35,7 +35,7 @@ def output(machine, file): #file should be an open, write textually file
   p('Pre_MEM Queue:')
   for i in range(2):
     if i < len(machine.preMem):
-      k = machine.preMem.queue[(i+1) * -1]['instruction']
+      k = machine.preMem.queue[(i + 1) * -1]['instruction']
       p(('\tEntry %d:\t' % i)+'['+dissassemble(k)+']')
     else:
       p(('\tEntry %d:\t') %i)
