@@ -81,3 +81,14 @@ class HazardUnit:
   def checkAll(self, curr):
     #bp()
     return self.checkWAW(curr) or self.checkRAW(curr) or self.checkWAR(curr) or self.checkLoads(curr) or self.checkStores(curr)
+  
+  def checkBranch(self, operands):
+    all = self.noIssued + self.active
+    for i in all:
+      try:
+        for j in operands:
+          if j == i['dest']:
+            return False
+      except KeyError:
+        continue
+    return True

@@ -60,9 +60,9 @@ class ALU(FunctionalUnit):
         out['data'] = self.registers[operands[1]] #move the data
       else: self.hazard.complete(curr['instruction']) #do not move the data
     elif op == 'sll':
-      out['data'] = self.registers[operands[0]] << self.registers[operands[1]] #should be the shift amount
+      out['data'] = self.registers[operands[0]] << (self.registers[operands[1]] + 2) #should be the shift amount
     elif op == 'srl':
-      out['data'] = self.registers[operands[0]] >> self.registers[operands[1]] #should be the shift amount
+      out['data'] = self.registers[operands[0]] >> (self.registers[operands[1]] + 2) #should be the shift amount
     elif op == 'mul':
       out['data'] = self.registers[operands[0]] * self.registers[operands[1]] #multiply the operands
     

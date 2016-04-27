@@ -79,6 +79,7 @@ class Issue(FunctionalUnit):
     self.registers = registers
   
   def execute(self):
+    self.hazard.purgeNoIssued()
     #bp()
     #set issued instructions = 0
     nIssued = 0
@@ -109,7 +110,6 @@ class Issue(FunctionalUnit):
           if curr['op'] == 'lw' or curr['op'] == 'sw':
             self.preMem.queue.appendleft(curr)
             self.preIssue.buffer.remove(instruction)
-            self.hazard.purgeNoIssued()
           else:
             self.preAlu.queue.appendleft(curr)
             self.preIssue.buffer.remove(instruction)
@@ -120,4 +120,3 @@ class Issue(FunctionalUnit):
         #exited normally, continue before we hit the break
         continue
       break
-    self.hazard.purgeNoIssued()
