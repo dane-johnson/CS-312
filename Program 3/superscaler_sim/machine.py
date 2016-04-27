@@ -8,6 +8,8 @@ from superscaler_sim.cache import Cache
 from superscaler_sim.memory import Memory
 from superscaler_sim.hazard import HazardUnit
 
+from pdb import set_trace as bp
+
 class Machine:
   def __init__(self, instructions):
     self.memory = Memory(instructions)
@@ -43,6 +45,7 @@ class Machine:
   def executeMix(self, f = None, *args): #f is a function to be run on the machine between each cycle
     self.cycleCount = 0
     while not self.shouldBreak[0] or len(self.hazard) != 0:
+      #bp()
       self.cycle()
       if self.shouldBreak[0] and len(self.hazard) == 0:
         self.cache.writeToMemory()

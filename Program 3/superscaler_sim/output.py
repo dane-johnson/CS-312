@@ -9,9 +9,14 @@ def output(machine, file): #file should be an open, write textually file
       s += str((w >> i) & 1)
     return s
   p('-' * 20)
-  #p(str(machine.pc))
-  #p(str(machine.hazard.active))
-  #p(str(machine.shouldBreak))
+  
+  #debug mode
+  #-----------------------------
+  # p(str(machine.pc))
+  # p(str(machine.hazard.active))
+  # p(str(machine.shouldBreak))
+  #-----------------------------
+  
   p('Cycle:%d' % machine.cycleCount) #print the cycle
   p() #print a blank line
   p('Pre-Issue Buffer:')
