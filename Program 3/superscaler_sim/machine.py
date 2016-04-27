@@ -14,7 +14,8 @@ class Machine:
   def __init__(self, instructions):
     self.memory = Memory(instructions)
     self.pc = [96]
-    self.hazard = HazardUnit()
+    self.preIssue = PreIssue()
+    self.hazard = HazardUnit(self.preIssue)
     self.registers = [0] * 32
     self.cache = Cache(self.memory)
     self.cycleCount = 0
@@ -27,12 +28,11 @@ class Machine:
     self.postMem = PostMEM()
     self.mem = MEM(cache = self.cache, registers = self.registers, hazard = self.hazard, preMem = self.preMem, postMem = self.postMem)
     
-    self.preIssue = PreIssue()
     self.issue = Issue(registers = self.registers, hazard = self.hazard, preIssue = self.preIssue, preMem = self.preMem, preAlu = self.preAlu)
     
     self.wb = WB(registers = self.registers, hazard = self.hazard, postMem = self.postMem, postAlu = self.postAlu)
     
-    self.fetch = IF(cache = self.cache, pc = self.pc, registers = self.registers, preIssue = self.preIssue, trigger = self.shouldBreak, hazard = self.hazard)
+    self.fetch = IF(cache = self.cache, pc = self.pc, registers = self.registers, preIssue = self.preIssue, trigger = self.shouldBreak, hazard = self.hazard, issue = self.issue)
   def cycle(self):
   #execute in reverse order
     self.cache.memoryRead()

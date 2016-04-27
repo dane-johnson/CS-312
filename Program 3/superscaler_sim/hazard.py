@@ -1,9 +1,12 @@
+from superscaler_sim.word import Instruction
+
 from pdb import set_trace as bp
 
 class HazardUnit:
-  def __init__(self):
+  def __init__(self, preIssue):
     self.active = []
     self.noIssued = []
+    self.preIssue = preIssue
   def __len__(self):
     return len(self.active) + len(self.noIssued)
   def purgeNoIssued(self):

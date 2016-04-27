@@ -13,7 +13,7 @@ def output(machine, file): #file should be an open, write textually file
   #debug mode
   #-----------------------------
   # p(str(machine.pc))
-  # p(str(machine.hazard.active))
+  # p(str(machine.hazard.active + machine.hazard.noIssued))
   # p(str(machine.shouldBreak))
   #-----------------------------
   

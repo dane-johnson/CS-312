@@ -120,3 +120,5 @@ class Issue(FunctionalUnit):
         #exited normally, continue before we hit the break
         continue
       break
+    for s in list(self.preIssue.buffer)[:]:
+      self.hazard.noIssued.append(self.buildInstruction(s))
