@@ -1,6 +1,8 @@
 from superscaler_sim.functional_unit import FunctionalUnit, UnitBuffer, READY, STALLED
 from superscaler_sim.cache import CacheMissError
 
+from pdb import set_trace as bp
+
 from collections import deque
 
 class PreMEM(UnitBuffer): #standard FIFO queue
@@ -47,6 +49,7 @@ class MEM(FunctionalUnit):
         try:
           dict = {}
           dict['instruction'] = curr['instruction'] #forward the instruction to the post memoryview
+          #bp()
           dict['data'] = self.cache.getWord(curr['addr'])
           dict['dest'] = curr['dest']
           self.preMem.queue.pop()

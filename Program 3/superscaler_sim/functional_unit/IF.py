@@ -2,6 +2,12 @@ from superscaler_sim.functional_unit import FunctionalUnit, READY, STALLED
 from superscaler_sim.cache import CacheMissError
 from superscaler_sim.word import Instruction
 
+from pdb import set_trace as bp
+
+class BranchError(Exception):
+  def __init__(self):
+    pass
+
 class IF (FunctionalUnit):
   def __init__(self, cache, pc, registers, trigger, hazard ,preIssue = None):
     FunctionalUnit.__init__(self)
@@ -29,15 +35,17 @@ class IF (FunctionalUnit):
       self.fetch()
     except CacheMissError:
       self.state = STALLED
-      return 
+      return
+    except BranchError:
+      return
     except TypeError:
       raise
   def fetch(self):
     word = self.cache.getWord(self.pc[0])
     #check if its valid
     if (word >> 31) <= 0:
-      self.pc[0] += 4
-      return #invalid instruction
+      self.pc[0] += 4 #invalid
+      return
     instruction = Instruction(word)
     op = instruction['op']
     #check if it is a branch
@@ -51,19 +59,19 @@ class IF (FunctionalUnit):
       elif func == 0b001000:  # JR
         if len(self.hazard) == 0:
           self.pc[0] = instruction['rs']
-        else:
-          return
+        raise BranchError()
       elif func == 0b001101: #BREAK
         self.trigger[0] = True
+        return
       else: self.pc[0] += 4
+      self.preIssue.buffer.append(word)
     elif op == 0b100001:  #BLTZ
       if len(self.hazard) == 0:
         if self.registers[instruction['rs']] < 0:
           self.pc[0] += (instruction['immed'] << 2) + 4
         else:
           self.pc[0] += 4
-      else:
-        return
+      raise BranchError()
     elif op == 0b100010: #J
       self.pc[0] = instruction['addr'] << 2
     elif op == 0b100100: #BEQ
@@ -72,6 +80,7 @@ class IF (FunctionalUnit):
           self.pc[0] = str(instruction['immed'])
         else:
           self.pc[0] += 4
+      raise BranchError()
     else:
       self.preIssue.buffer.append(word)
       self.pc[0] += 4

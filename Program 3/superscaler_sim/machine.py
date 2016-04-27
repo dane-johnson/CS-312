@@ -17,7 +17,6 @@ class Machine:
     self.cache = Cache(self.memory)
     self.cycleCount = 0
     self.shouldBreak = [False]
-    
     self.preAlu = PreALU()
     self.postAlu = PostALU()
     self.alu = ALU(hazard = self.hazard, registers = self.registers, preAlu = self.preAlu, postAlu = self.postAlu)

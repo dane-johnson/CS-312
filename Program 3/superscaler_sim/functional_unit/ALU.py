@@ -1,4 +1,5 @@
 from superscaler_sim.functional_unit import FunctionalUnit, UnitBuffer, READY, STALLED
+from superscaler_sim.word import Word
 
 from collections import deque
 from pdb import set_trace as bp
@@ -46,6 +47,7 @@ class ALU(FunctionalUnit):
     if op == 'add':
       out['data'] = self.registers[operands[0]] + self.registers[operands[1]] #add the operands
     elif op == 'addi':
+      #bp()
       out['data'] = self.registers[operands[0]] + operands[1]
     elif op == 'sub':
       out['data'] = self.registers[operands[0]] - self.registers[operands[1]] #subtract the operands

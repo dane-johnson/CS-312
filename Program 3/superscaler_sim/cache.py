@@ -35,12 +35,14 @@ class Cache:
     #calculate the tag
     tag = address >> 5
     set = self.sets[index]
-    for entry in set.entries:
+    for i, entry in enumerate(set.entries):
       if entry.v == 1 and entry.tag == tag:
       #if it is in cache return the word
+        set.lru = i ^ 1
         return entry.words[wo]
     else:
     #if not in cache, throw a cache miss exception
+      
       self.missed.appendleft(address)
       raise CacheMissError(address)
     
@@ -62,6 +64,13 @@ class Cache:
     #put into LRU entry in the corresponding set
     set = self.sets[index]
     entry = set.entries[set.lru]
+    if entry.d == 1:
+      #find data address
+      wbAddress = 0
+      wbAddress += (entry.tag << 5)
+      wbAddress += (index << 3)
+      self.memory[wbAddress] = entry.words[0]
+      self.memory[wbAddress + 4] = entry.words[1]
     entry.v = 1
     entry.tag = tag
     entry.words = words
@@ -77,8 +86,9 @@ class Cache:
     tag = address >> 5
     set = self.sets[index]
     
-    for entry in set.entries:
+    for i, entry in enumerate(set.entries):
       if entry.v and entry.tag == tag:
+        set.lru = i ^ 1
         break
     else:
       self.missed.appendleft(address)
@@ -88,8 +98,6 @@ class Cache:
     #set the valid and dirty bits
     entry.v = 1
     entry.d = 1
-    #update the lru
-    set.lru ^ 1
     
   def writeToMemory(self):
     #loop through all of cache

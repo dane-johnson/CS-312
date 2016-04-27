@@ -14,6 +14,7 @@ class Word:
     return num
   @classmethod
   def convert16BitUnsignedToSigned(cls, num):
+    if num < 0: return num
     negBitMask  = 0x8000
     flipBitMask = 0xFFFF
     if (negBitMask & num) > 0:

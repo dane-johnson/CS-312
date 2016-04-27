@@ -27,6 +27,7 @@ class Issue(FunctionalUnit):
     curr['instruction'] = word
     op = instruction['op']
     if op == 0b100000 :# R Type, many cases
+      #bp()
       func = instruction['func']
       if   func == 0b000000: # SLL
         curr['op'] = 'sll'
@@ -54,17 +55,19 @@ class Issue(FunctionalUnit):
     elif op == 0b101000:	#ADDI
       curr['op'] = 'addi'
       curr['dest'] = instruction['rt']
+      #bp()
       curr['operands'] = (instruction['rs'], instruction['immed'])
       return curr
     elif op == 0b100011:	#LW
       curr['op'] = 'lw'
       curr['dest'] = instruction['rt']
-      curr['addr'] = instruction['rs'] + instruction['immed']
+      curr['addr'] = self.registers[instruction['rs']] + instruction['immed']
+      curr['operands'] = (instruction['rs'],)
       return curr
     else:	#SW
       curr['op'] = 'sw'
       curr['operands'] = (instruction['rt'],)
-      curr['addr'] = instruction['rs'] + instruction['immed']
+      curr['addr'] = self.registers[instruction['rs']] + instruction['immed']
       return curr
 
   def __init__(self, hazard, registers, preIssue = None, preMem = None, preAlu = None):
@@ -90,11 +93,11 @@ class Issue(FunctionalUnit):
         #peek at the next instruction, determine op code, registers, construct the instruction
         curr = self.buildInstruction(instruction)
         #Check for structural hazards, WAW hazards, WAR hazards, RAW hazards, previous sw issued 
-        if (curr['op'] == 'lw' or curr['op'] == 'sw') and len(self.preMem) >= 4:
+        if (curr['op'] == 'lw' or curr['op'] == 'sw') and len(self.preMem) >= 2:
           #preMem full
           self.hazard.noIssued.append(curr)
           continue
-        elif len(self.preAlu) >= 4:
+        elif len(self.preAlu) >= 2:
           #preAlu full
           self.hazard.noIssued.append(curr)
           continue

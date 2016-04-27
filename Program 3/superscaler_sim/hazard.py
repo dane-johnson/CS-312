@@ -34,7 +34,8 @@ class HazardUnit:
       #instuction has no operands, just execute
       return False
     operands = curr['operands']
-    for i in self.active:
+    all = self.active + self.noIssued
+    for i in all:
       try:
         for j in operands:
           if j == i['dest']:
@@ -48,11 +49,12 @@ class HazardUnit:
     if not 'dest' in curr.keys():
       #we aren't writing, don't sweat it
       return False
+    all = self.active + self.noIssued
     for i in self.noIssued:
       try:
         operands = i['operands']
         for j in operands:
-          if i['dest'] == j:
+          if curr['dest'] == j:
             #hazards, don't execute
             return True
       except KeyError:
@@ -63,7 +65,8 @@ class HazardUnit:
     if 'lw' != curr['op']:
       #not a load word, no problem
       return False
-    for i in self.active:
+    all = self.noIssued
+    for i in all:
       if i['op'] == 'sw':
         return True
     return False
@@ -72,7 +75,7 @@ class HazardUnit:
       #not a store
       return False
     for i in self.noIssued:
-      if i['op'] == 'sw':
+      if i['op'] == 'sw' or i['op'] == 'lw':
         return True
     return False
   def checkAll(self, curr):

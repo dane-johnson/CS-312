@@ -10,6 +10,8 @@ def output(machine, file): #file should be an open, write textually file
     return s
   p('-' * 20)
   #p(str(machine.pc))
+  #p(str(machine.hazard.active))
+  #p(str(machine.shouldBreak))
   p('Cycle:%d' % machine.cycleCount) #print the cycle
   p() #print a blank line
   p('Pre-Issue Buffer:')
@@ -58,7 +60,7 @@ def output(machine, file): #file should be an open, write textually file
     for j, l in enumerate(k.entries):
       p('\tEntry %d:[(%d,%d,%d)<%s,%s>]' % (j, l.v, l.d, l.tag, bin(l.words[0]), bin(l.words[1])))
   p()
-  dataAddr = findDataAddress(machine)
+  dataAddr = findDataAddress(machine.memory.instructions)
   p("Data")
   for i, instruction in enumerate(machine.memory.instructions[dataAddr:]):
     if(i % 8 == 0):
@@ -128,8 +130,8 @@ def dissassemble(word):
   elif op == 0b100011: return LW(instruction)     #LW
   elif op == 0b101011: return SW(instruction)      #SW
   else:         return INVALID(instruction)
-def findDataAddress(machine):
-    for i, instruction in enumerate(machine.memory.instructions):
+def findDataAddress(instructions):
+    for i, instruction in enumerate(instructions):
       instruction = Instruction(instruction)
       if instruction['op'] == 0b100000 and instruction['func'] == 0b001101: #BREAK statement
         return i + 1
